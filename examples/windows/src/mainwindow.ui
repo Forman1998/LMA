@@ -18,23 +18,16 @@
     <property name="geometry">
      <rect>
       <x>720</x>
-      <y>330</y>
+      <y>320</y>
       <width>281</width>
-      <height>238</height>
+      <height>264</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">
-     <item row="7" column="0">
-      <widget class="QCheckBox" name="rogowski_checkbox">
+     <item row="0" column="0">
+      <widget class="SampleInput" name="sample_count_input">
        <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QCheckBox" name="calibrate_checkbox">
-       <property name="text">
-        <string/>
+        <string>18000</string>
        </property>
       </widget>
      </item>
@@ -45,59 +38,17 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="sample_frequency_label">
-       <property name="text">
-        <string>Sampling Frequency[Hz]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLabel" name="line_frequency_label">
-       <property name="text">
-        <string>Line Frequency [Hz]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLabel" name="vrms_label">
-       <property name="text">
-        <string>RMS Voltage [V]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLabel" name="irms_label">
-       <property name="text">
-        <string>RMS Current [A}</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLabel" name="phase_shift_label">
-       <property name="text">
-        <string>Phase Shift [degrees]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1">
-      <widget class="QLabel" name="rogowski_label">
-       <property name="text">
-        <string>Rogowski</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLineEdit" name="sample_count_input">
-       <property name="text">
-        <string>39000</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QLineEdit" name="sample_frequency_input">
        <property name="text">
         <string>3906.25</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="sample_frequency_label">
+       <property name="text">
+        <string>Sampling Frequency[Hz]</string>
        </property>
       </widget>
      </item>
@@ -108,10 +59,24 @@
        </property>
       </widget>
      </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="line_frequency_label">
+       <property name="text">
+        <string>Line Frequency [Hz]</string>
+       </property>
+      </widget>
+     </item>
      <item row="3" column="0">
       <widget class="QLineEdit" name="vrms_input">
        <property name="text">
         <string>230</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="vrms_label">
+       <property name="text">
+        <string>RMS Voltage [V]</string>
        </property>
       </widget>
      </item>
@@ -122,6 +87,13 @@
        </property>
       </widget>
      </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="irms_label">
+       <property name="text">
+        <string>RMS Current [A}</string>
+       </property>
+      </widget>
+     </item>
      <item row="5" column="0">
       <widget class="QLineEdit" name="phase_shift_input">
        <property name="text">
@@ -129,10 +101,17 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="0" colspan="2">
-      <widget class="QPushButton" name="simulate_button">
+     <item row="5" column="1">
+      <widget class="QLabel" name="phase_shift_label">
        <property name="text">
-        <string>Simulate</string>
+        <string>Phase Shift [degrees]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QCheckBox" name="calibrate_checkbox">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
@@ -140,6 +119,27 @@
       <widget class="QLabel" name="calibrate_label">
        <property name="text">
         <string>Calibrate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QCheckBox" name="rogowski_checkbox">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QLabel" name="rogowski_label">
+       <property name="text">
+        <string>Rogowski</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0" colspan="2">
+      <widget class="QPushButton" name="simulate_button">
+       <property name="text">
+        <string>Simulate</string>
        </property>
       </widget>
      </item>
@@ -198,6 +198,13 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SampleInput</class>
+   <extends>QLineEdit</extends>
+   <header location="global">sampleinput.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

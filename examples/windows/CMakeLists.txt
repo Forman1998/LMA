@@ -10,6 +10,7 @@ set (SOURCES
     "src/simulation/simulation.cpp"
     "../../src/LMA_Core.c"
     "../../port/windows/LMA_Port.c"
+    "src/sampleinput.cpp"
 )
 set (HEADERS
     "src/mainwindow.hpp"
@@ -17,6 +18,7 @@ set (HEADERS
     "../../src/LMA_Core.h"
     "../../src/LMA_Utils/LMA_Types.h"
     "../../port/windows/LMA_Port.h"
+    "src/sampleinput.h"
 )
 # setup directories
 set (DIRECTORIES
