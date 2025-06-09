@@ -95,6 +95,24 @@ void MainWindow::on_simulate_button_clicked()
     p_simulation_params->calibrate = ui->calibrate_checkbox->isChecked();
     p_simulation_params->rogowski = ui->rogowski_checkbox->isChecked();
 
+    auto set_integrator = ui->Integrator_comboBox->currentText().toStdString();
+    if ("Trapezoidl" == set_integrator)
+    {
+      p_simulation_params->Integrator = 1;
+    }
+    else if ("RK4" == set_integrator)
+    {
+      p_simulation_params->Integrator = 2;
+    }
+    else if ("RK2" == set_integrator)
+    {
+      p_simulation_params->Integrator = 3;
+    }
+    else
+    {
+        //shouldn't go here
+    }
+
     // Launch the simulation in another thread
     auto simulation_future = QtConcurrent::run(
         [=]()

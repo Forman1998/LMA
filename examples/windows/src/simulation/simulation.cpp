@@ -1,4 +1,5 @@
 #include "simulation.hpp"
+#include "mainwindow.hpp"
 #include <atomic>
 #include <chrono>
 #include <iomanip>
@@ -46,6 +47,35 @@ static std::pair<std::unique_ptr<std::vector<int32_t>>, std::unique_ptr<std::vec
   }
 
   return std::make_pair<std::unique_ptr<std::vector<int32_t>>, std::unique_ptr<std::vector<double>>>(std::move(res_adc), std::move(res));
+}
+
+// Cosine wave generator
+static std::pair<std::unique_ptr<std::vector<int32_t>>, std::unique_ptr<std::vector<double>>>
+GenerateCosineWaveADC(size_t numSamples, double frequency, double phaseShift, double rmsValue, double gain, double divRatio,
+                    double sampleRate)
+{
+  auto res_adc = std::make_unique<std::vector<int32_t>>();
+  auto res = std::make_unique<std::vector<double>>();
+
+  if (sampleRate <= 0.0 || numSamples == 0 || divRatio == 0.0)
+  {
+    std::cerr << "\n\rInvalid waveform, potential memory issue, check args and try reducing samples\n\r";
+  }
+
+  const double amplitude = rmsValue * std::sqrt(2.0);
+  const double omega = 2.0 * 3.14159265358979323846 * frequency;
+  const double dt = 1.0 / sampleRate;
+
+  for (size_t i = 0; i < numSamples; ++i)
+  {
+    double time = i * dt;
+    double sample = amplitude * std::cos(omega * time + (phaseShift * 3.14159265358979323846 / 180.0));
+    res->push_back(sample);
+    res_adc->push_back(static_cast<int32_t>(std::round(sample * gain * divRatio * (1 << 23) / 0.5)));
+  }
+
+  return std::make_pair<std::unique_ptr<std::vector<int32_t>>, std::unique_ptr<std::vector<double>>>(std::move(res_adc),
+                                                                                                     std::move(res));
 }
 
 static void Driver_thread(std::shared_ptr<DriverParams> drvr_params)
@@ -98,6 +128,8 @@ std::shared_ptr<SimulationResults> Simulation(const SimulationParams *sim_params
 {
   auto results = std::make_shared<SimulationResults>();
   auto drv_params = std::make_shared<DriverParams>();
+  auto raw_results = std::make_shared<SimulationResults>();
+  auto raw_drv_params = std::make_shared<DriverParams>();
 
   results->voltage_signal = std::make_unique<std::vector<double>>();
   results->current_signal = std::make_unique<std::vector<double>>();
@@ -115,9 +147,107 @@ std::shared_ptr<SimulationResults> Simulation(const SimulationParams *sim_params
   else
   {
     auto i_pair =
-        GenerateSineWaveADC(sim_params->sample_count, sim_params->fline, 0.0, sim_params->irms, 8, 0.0004, sim_params->fs);
+        GenerateCosineWaveADC(sim_params->sample_count, sim_params->fline, 0.0, sim_params->irms, 8, 0.0004, sim_params->fs);
     drv_params->p_current_samples = std::move(i_pair.first);
     results->current_signal = std::move(i_pair.second);
+    std::cout << std::fixed << std::setprecision(4) << "\t\tArray Size     " << drv_params->p_current_samples->size()
+              << "\n";
+    if (1 == sim_params->Integrator) //TRAP
+    {
+      auto k2 = drv_params->p_current_samples->at(0);
+      auto k1 = drv_params->p_current_samples->at(1);
+      for (int i = 0; i < drv_params->p_current_samples->size(); i++)
+      {
+        if (i == 0)
+        {
+          k1 = 0;
+          k2 = drv_params->p_current_samples->at(i);
+        }
+        else
+        {
+          k1 = k2;
+          k2 = drv_params->p_current_samples->at(i);
+        }
+        drv_params->p_current_samples->at(i) = (k1 + k2) / 2;
+      }
+    }
+    else if (2 == sim_params->Integrator) //RK4
+    {
+      auto k4 = drv_params->p_current_samples->at(0);
+      auto k3 = drv_params->p_current_samples->at(1);
+      auto k2 = drv_params->p_current_samples->at(2);
+      auto k1 = drv_params->p_current_samples->at(3);
+      for (int i = 0; i < drv_params->p_current_samples->size(); i++)
+      {
+        if (i == 0)
+        {
+          k1 = 0;
+          k2 = 0;
+          k3 = 0;
+          k4 = drv_params->p_current_samples->at(i);
+        }
+        else if (i == 1)
+        {
+          k1 = 0;
+          k2 = 0;
+          k3 = k4;
+          k4 = drv_params->p_current_samples->at(i);
+        }
+        else if (i == 2)
+        {
+          k1 = 0;
+          k2 = k3;
+          k3 = k4;
+          k4 = drv_params->p_current_samples->at(i);
+        }        
+        else
+        {
+          k1 = k2;
+          k2 = k3;
+          k3 = k4;
+          k4 = drv_params->p_current_samples->at(i);
+        }  
+        drv_params->p_current_samples->at(i) = (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+      }
+    }
+    else if (3 == sim_params->Integrator) //RK2
+    {
+      /*auto k2 = drv_params->p_current_samples->at(0);
+      auto k1 = drv_params->p_current_samples->at(1);
+      auto prev_result = drv_params->p_current_samples->at(0);
+      prev_result = 0;
+      for (int i = 0; i < drv_params->p_current_samples->size(); i++)
+      {
+        if (i == 0)
+        {
+          k1 = 0;
+          k2 = drv_params->p_current_samples->at(i);
+        }
+        else
+        {
+          k1 = k2;
+          k2 = drv_params->p_current_samples->at(i);         
+        }
+        prev_result = prev_result + (k1 + k2) / 2;
+        drv_params->p_current_samples->at(i) = prev_result;
+      }*/
+      double h = sim_params->irms / (drv_params->p_current_samples->size() - 1);
+      auto prev_result = drv_params->p_current_samples->at(0);
+      prev_result = 0;
+      for (int i = 0; i < drv_params->p_current_samples->size()-1; i++)
+      {
+        auto k1 = drv_params->p_current_samples->at(i);
+        auto k2 = (drv_params->p_current_samples->at(i) + drv_params->p_current_samples->at(i + 1)) / 2.0;
+
+        prev_result = prev_result + k2 * h; 
+
+        drv_params->p_current_samples->at(i) = prev_result;
+      }
+    }
+    else
+    {
+        // Should never go here
+    }
   }
   drv_params->fs = sim_params->fs;
 

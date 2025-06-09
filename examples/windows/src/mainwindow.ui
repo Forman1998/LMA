@@ -20,7 +20,7 @@
       <x>720</x>
       <y>320</y>
       <width>281</width>
-      <height>264</height>
+      <height>266</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">
@@ -136,10 +136,42 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="0" colspan="2">
+     <item row="9" column="0" colspan="2">
       <widget class="QPushButton" name="simulate_button">
        <property name="text">
         <string>Simulate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QComboBox" name="Integrator_comboBox">
+       <property name="iconSize">
+        <size>
+         <width>133</width>
+         <height>16</height>
+        </size>
+       </property>
+       <item>
+        <property name="text">
+         <string>Trapezoidl</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>RK4</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>RK2</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QLabel" name="Integrator_label">
+       <property name="text">
+        <string>Integration Method </string>
        </property>
       </widget>
      </item>

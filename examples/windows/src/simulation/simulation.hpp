@@ -26,6 +26,7 @@ typedef struct SimulationParams
     bool calibrate; /**< flag to enable/disable calibration on startup */
     bool rogowski; /**< flag to enable/disable rogowski on startup */
     std::atomic<bool> stop_simulation;   /**< signal to stop the simulation*/
+    double Integrator;
 }SimulationParams;
 
 /** @brief results of smiulation*/
